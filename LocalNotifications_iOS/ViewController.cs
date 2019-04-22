@@ -28,7 +28,11 @@ namespace LocalNotifications_iOS
         private void OnSendAlert(object sender, EventArgs e)
         {
             // Get current notification settings
-            //UNUserNotificationCenter.Current.GetNotificationSettings(OnNotificationSettings);
+            //UNUserNotificationCenter.Current.GetNotificationSettings((settings) =>
+            //{
+            //    alertsAllowed = (settings.AlertSetting == UNNotificationSetting.Enabled);
+            //    swtAlertsAllowed.On = alertsAllowed;
+            //});
 
             if (alertsAllowed)
             {
@@ -62,6 +66,42 @@ namespace LocalNotifications_iOS
             }
             else
                 lblAlertStatus.Text = "Alerts NOT Allowed";
+
+            //InvokeOnMainThread(() =>
+            //{
+            //    if (alertsAllowed)
+            //    {
+            //        // Create the content of the Local Notification
+            //        UNMutableNotificationContent content = new UNMutableNotificationContent();
+            //        content.Title = txtNotificationTitle.Text;
+            //        content.Subtitle = txtNotificationSubTitle.Text;
+            //        content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
+            //        content.Badge = 1;
+
+            //        UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
+
+            //        string requestID = $"SampleRequest{alertCount}";
+            //        UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
+
+            //        lblAlertStatus.Text = "Sending Alert...";
+
+            //        UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
+            //        {
+            //            if (err != null)
+            //            {
+            //                //this.lblAlertStatus.Text = "Error: Alert NOT Sent";
+            //            }
+            //            else
+            //            {
+            //                //this.lblAlertStatus.Text = "Alert Sent";
+            //            }
+            //        });
+
+            //        alertCount++;
+            //    }
+            //    else
+            //        lblAlertStatus.Text = "Alerts NOT Allowed";
+            //});
         }
 
         private void OnNotificationSettings(UNNotificationSettings settings)
