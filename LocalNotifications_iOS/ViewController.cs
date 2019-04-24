@@ -27,81 +27,84 @@ namespace LocalNotifications_iOS
 
         private void OnSendAlert(object sender, EventArgs e)
         {
-            // Get current notification settings
-            //UNUserNotificationCenter.Current.GetNotificationSettings((settings) =>
-            //{
-            //    alertsAllowed = (settings.AlertSetting == UNNotificationSetting.Enabled);
-            //    swtAlertsAllowed.On = alertsAllowed;
-            //});
-
-            if (alertsAllowed)
+            //Get current notification settings
+            UNUserNotificationCenter.Current.GetNotificationSettings((settings) =>
             {
-                // Create the content of the Local Notification
-                UNMutableNotificationContent content = new UNMutableNotificationContent();
-                content.Title = txtNotificationTitle.Text;
-                content.Subtitle = txtNotificationSubTitle.Text;
-                content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
-                content.Badge = 1;
+                alertsAllowed = (settings.AlertSetting == UNNotificationSetting.Enabled);
+                swtAlertsAllowed.On = alertsAllowed;
+            });
 
-                UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
+            // Code following the suggestion made in this Xamarin Forms Forum thread
+            //   https://forums.xamarin.com/discussion/comment/372220#Comment_372220
 
-                string requestID = $"SampleRequest{alertCount}";
-                UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
-
-                lblAlertStatus.Text = "Sending Alert...";
-
-                UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
+            InvokeOnMainThread(() =>
+            {
+                if (alertsAllowed)
                 {
-                    if (err != null)
-                    {
-                        //this.lblAlertStatus.Text = "Error: Alert NOT Sent";
-                    }
-                    else
-                    {
-                        //this.lblAlertStatus.Text = "Alert Sent";
-                    }
-                });
+                    // Create the content of the Local Notification
+                    UNMutableNotificationContent content = new UNMutableNotificationContent();
+                    content.Title = txtNotificationTitle.Text;
+                    content.Subtitle = txtNotificationSubTitle.Text;
+                    content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
+                    content.Badge = 1;
 
-                alertCount++;
-            }
-            else
-                lblAlertStatus.Text = "Alerts NOT Allowed";
+                    UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
 
-            //InvokeOnMainThread(() =>
+                    string requestID = $"SampleRequest{alertCount}";
+                    UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
+
+                    lblAlertStatus.Text = "Sending Alert...";
+
+                    UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
+                    {
+                        if (err != null)
+                        {
+                            //this.lblAlertStatus.Text = "Error: Alert NOT Sent";
+                        }
+                        else
+                        {
+                            //this.lblAlertStatus.Text = "Alert Sent";
+                        }
+                    });
+
+                    alertCount++;
+                }
+                else
+                    lblAlertStatus.Text = "Alerts NOT Allowed";
+            });
+
+            //if (alertsAllowed)
             //{
-            //    if (alertsAllowed)
+            //    // Create the content of the Local Notification
+            //    UNMutableNotificationContent content = new UNMutableNotificationContent();
+            //    content.Title = txtNotificationTitle.Text;
+            //    content.Subtitle = txtNotificationSubTitle.Text;
+            //    content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
+            //    content.Badge = 1;
+
+            //    UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
+
+            //    string requestID = $"SampleRequest{alertCount}";
+            //    UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
+
+            //    lblAlertStatus.Text = "Sending Alert...";
+
+            //    UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
             //    {
-            //        // Create the content of the Local Notification
-            //        UNMutableNotificationContent content = new UNMutableNotificationContent();
-            //        content.Title = txtNotificationTitle.Text;
-            //        content.Subtitle = txtNotificationSubTitle.Text;
-            //        content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
-            //        content.Badge = 1;
-
-            //        UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
-
-            //        string requestID = $"SampleRequest{alertCount}";
-            //        UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
-
-            //        lblAlertStatus.Text = "Sending Alert...";
-
-            //        UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
+            //        if (err != null)
             //        {
-            //            if (err != null)
-            //            {
-            //                //this.lblAlertStatus.Text = "Error: Alert NOT Sent";
-            //            }
-            //            else
-            //            {
-            //                //this.lblAlertStatus.Text = "Alert Sent";
-            //            }
-            //        });
+            //            //this.lblAlertStatus.Text = "Error: Alert NOT Sent";
+            //        }
+            //        else
+            //        {
+            //            //this.lblAlertStatus.Text = "Alert Sent";
+            //        }
+            //    });
 
-            //        alertCount++;
-            //    }
-            //    else
-            //        lblAlertStatus.Text = "Alerts NOT Allowed";
-            //});
+            //    alertCount++;
+            //}
+            //else
+            //    lblAlertStatus.Text = "Alerts NOT Allowed";
         }
 
         private void OnNotificationSettings(UNNotificationSettings settings)
