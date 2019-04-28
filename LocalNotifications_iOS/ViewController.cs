@@ -28,55 +28,58 @@ namespace LocalNotifications_iOS
 
         private void OnSendAlert(object sender, EventArgs e)
         {
+            // Code following the suggestions made in this Xamarin Forms Forum thread
+            //   https://forums.xamarin.com/discussion/comment/372220#Comment_372220
+
             //Get current notification settings
             UNUserNotificationCenter.Current.GetNotificationSettings((settings) =>
             {
                 alertsAllowed = (settings.AlertSetting == UNNotificationSetting.Enabled);
-            });
 
-            // Code following the suggestions made in this Xamarin Forms Forum thread
-            //   https://forums.xamarin.com/discussion/comment/372220#Comment_372220
-
-            swtAlertsAllowed.On = alertsAllowed;
-
-            if (alertsAllowed)
-            {
-                // Create the content of the Local Notification
-                UNMutableNotificationContent content = new UNMutableNotificationContent();
-                content.Title = txtNotificationTitle.Text;
-                content.Subtitle = txtNotificationSubTitle.Text;
-                content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
-                content.Badge = 1;
-
-                UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
-
-                string requestID = $"SampleRequest{alertCount}";
-                UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
-
-                lblAlertStatus.Text = "Sending Alert...";
-
-                UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
+                InvokeOnMainThread(() =>
                 {
-                    if (err != null)
+                    swtAlertsAllowed.On = alertsAllowed;
+
+                    if (alertsAllowed)
                     {
-                        InvokeOnMainThread(() =>
+                        // Create the content of the Local Notification
+                        UNMutableNotificationContent content = new UNMutableNotificationContent();
+                        content.Title = txtNotificationTitle.Text;
+                        content.Subtitle = txtNotificationSubTitle.Text;
+                        content.Body = $"{txtNotificationBody.Text} with Notification Count of {alertCount}";
+                        content.Badge = 1;
+
+                        UNTimeIntervalNotificationTrigger trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(15.0, false);
+
+                        string requestID = $"SampleRequest{alertCount}";
+                        UNNotificationRequest request = UNNotificationRequest.FromIdentifier(requestID, content, trigger);
+
+                        lblAlertStatus.Text = "Sending Alert...";
+
+                        UNUserNotificationCenter.Current.AddNotificationRequest(request, (err) =>
                         {
-                            lblAlertStatus.Text = "Error: Alert NOT Sent";
+                            if (err != null)
+                            {
+                                InvokeOnMainThread(() =>
+                                {
+                                    lblAlertStatus.Text = "Error: Alert NOT Sent";
+                                });
+                            }
+                            else
+                            {
+                                InvokeOnMainThread(() =>
+                                {
+                                    lblAlertStatus.Text = $"Alert (ID: {requestID}) Sent will appear after 15 seconds";
+                                });
+                            }
                         });
+
+                        alertCount++;
                     }
                     else
-                    {
-                        InvokeOnMainThread(() =>
-                        {
-                            lblAlertStatus.Text = $"Alert (ID: {requestID}) Sent will appear after 15 seconds";
-                        });
-                    }
+                        lblAlertStatus.Text = "Alerts NOT Allowed";
                 });
-
-                alertCount++;
-            }
-            else
-                lblAlertStatus.Text = "Alerts NOT Allowed";
+            });
         }
 
         private void OnNotificationSettings(UNNotificationSettings settings)
